@@ -134,6 +134,8 @@ def update_dashboard(start_date, end_date):
 
     return line_fig, pie_fig, f"₹ {total:,.0f}", f"₹ {cash:,.0f}", f"₹ {online:,.0f}", f"Week: {highest_day['Week'][0]} - {highest_day['Weekday'][0]}: ₹ {highest_day['Amount'][0]:,.0f}", f"₹ {avg_sales:,.0f}"
 
+server = app.server 
+
 if __name__ == "__main__":
     app.run_server(
         host="0.0.0.0",
