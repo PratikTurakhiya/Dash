@@ -82,11 +82,10 @@ def update_dashboard(start_date, end_date):
     # Filter data by the selected date range
     filtered_df = df[(df["Date"] >= start_date) & (df["Date"] <= end_date)]
 
-    # If no data available for selected range, handle gracefully
     if filtered_df.empty:
         return go.Figure(), go.Figure(), "₹ 0", "₹ 0", "₹ 0", "N/A", "₹ 0"
 
-    # Line chart with improvements
+    # Line chart
     line_data = filtered_df.groupby("Date")["Amount"].sum().reset_index()
     line_fig = go.Figure()
 
@@ -110,7 +109,7 @@ def update_dashboard(start_date, end_date):
         transition_duration=500
     )
 
-    # Pie chart with better colors and labels
+    # Pie chart
     pie_data = filtered_df.groupby("Payment Mode")["Amount"].sum().reset_index()
     pie_fig = px.pie(pie_data, values="Amount", names="Payment Mode", title="Payment Breakdown", hole=0.4)
     pie_fig.update_traces(
@@ -123,23 +122,28 @@ def update_dashboard(start_date, end_date):
         margin=dict(l=20, r=20, t=40, b=20)
     )
 
-    # Summary stats
+    # Stats
     total = filtered_df["Amount"].sum()
     cash = filtered_df[filtered_df["Payment Mode"] == "Cash"]["Amount"].sum()
     online = filtered_df[filtered_df["Payment Mode"] == "Online"]["Amount"].sum()
 
-    # Highest sales day of the week
     weekly_sales = filtered_df.groupby(['Week', 'Weekday'])['Amount'].sum().reset_index()
     highest_sales_day = weekly_sales.loc[weekly_sales.groupby('Week')['Amount'].idxmax()].reset_index(drop=True)
     highest_day = highest_sales_day[['Week', 'Weekday', 'Amount']]
-
-    # Average daily sales
     avg_sales = filtered_df["Amount"].mean()
 
-    return line_fig, pie_fig, f"₹ {total:,.0f}", f"₹ {cash:,.0f}", f"₹ {online:,.0f}", f"Week: {highest_day['Week'][0]} - {highest_day['Weekday'][0]}: ₹ {highest_day['Amount'][0]:,.0f}", f"₹ {avg_sales:,.0f}"
+    return (
+        line_fig,
+        pie_fig,
+        f"₹ {total:,.0f}",
+        f"₹ {cash:,.0f}",
+        f"₹ {online:,.0f}",
+        f"Week: {highest_day['Week'][0]} - {highest_day['Weekday'][0]}: ₹ {highest_day['Amount'][0]:,.0f}",
+        f"₹ {avg_sales:,.0f}"
+    )
 
 if __name__ == "__main__":
-    app.run_server(
+    app.run(  # 👈 updated here
         host="0.0.0.0",
         port=int(os.environ.get("PORT", 8050)),
         debug=False
