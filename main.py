@@ -82,6 +82,10 @@ def update_dashboard(start_date, end_date):
     # Filter data by the selected date range
     filtered_df = df[(df["Date"] >= start_date) & (df["Date"] <= end_date)]
 
+    # If no data available for selected range, handle gracefully
+    if filtered_df.empty:
+        return go.Figure(), go.Figure(), "₹ 0", "₹ 0", "₹ 0", "N/A", "₹ 0"
+
     # Line chart with improvements
     line_data = filtered_df.groupby("Date")["Amount"].sum().reset_index()
     line_fig = go.Figure()
